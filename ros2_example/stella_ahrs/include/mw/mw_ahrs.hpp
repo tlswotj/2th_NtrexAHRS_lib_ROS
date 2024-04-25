@@ -7,8 +7,7 @@
 #include <memory>
 #include <string>
 #include <iostream>
-#include <thread>
-#include <mutex>
+#include <pthread.h>
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/time_source.hpp"
@@ -39,52 +38,41 @@ static float acc_value[3] = {
              mag_value[3] = {
                  0,
 };
-
+static bool run_bool = false;
 
 namespace ntrex
 {
     class MwAhrsRosDriver : public rclcpp::Node
     {
     public:
-        sensor_msgs::msg::Imu imu_data_raw_msg;
-        sensor_msgs::msg::Imu imu_data_msg;
-        sensor_msgs::msg::MagneticField imu_magnetic_msg;
-        std_msgs::msg::Float64 imu_yaw_msg;
-
-        tf2::Quaternion tf_orientation;
-
-    public:
-        double linear_acceleration_stddev_, angular_velocity_stddev_, magnetic_field_stddev_, orientation_stddev_;
-        double linear_acceleration_cov, angular_velocity_cov, magnetic_field_cov, orientation_cov;
-        double roll, pitch, yaw;
-
     private:
+        pid_t pid;
+        pthread_t tid;
+
         bool publish_tf_;
         std::string parent_frame_id_;
         std::string frame_id_;
-        std::mutex _lockAHRS;
+
+        double linear_acceleration_stddev_;
+        double angular_velocity_stddev_;
+        double magnetic_field_stddev_;
+        double orientation_stddev_;
 
     public:
         MwAhrsRosDriver(char *port, int baud_rate, int sel);
         ~MwAhrsRosDriver();
 
-        void StartReading();
-        void StopReading();
-        void StartPubing();
-        void StopPubing();
-
-        void covariance_calc();
-
-        std::thread reading_thread_, publisher_thread_;
-
-        void MwAhrsRead();
-        tf2::Quaternion Euler2Quaternion(float roll, float pitch, float yaw);
+        static void *MwAhrsRead(void *);
         void publish_topic();
+        tf2::Quaternion Euler2Quaternion(float roll, float pitch, float yaw);
 
     private:
         rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_data_raw_pub_, imu_data_pub_;
         rclcpp::Publisher<sensor_msgs::msg::MagneticField>::SharedPtr imu_mag_pub_;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr imu_yaw_pub_;
         std::unique_ptr<tf2_ros::TransformBroadcaster> broadcaster_;
+
+        // ROS timer
+        rclcpp::TimerBase::SharedPtr AHRS_publish_topic_timer;
     };
 }
