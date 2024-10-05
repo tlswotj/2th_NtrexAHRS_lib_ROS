@@ -36,14 +36,20 @@ def generate_launch_description():
         arguments=['-d', rviz_config_file],
         output='screen')
 
+    # driver_node = LifecycleNode(package='stella_ahrs',
+    #                             node_executable='stella_ahrs_node',
+    #                             node_name='stella_ahrs_node',
+    #                             output='screen',
+    #                             emulate_tty=True,
+    #                             node_namespace='/',
+    #                             )
     driver_node = LifecycleNode(package='stella_ahrs',
-                                node_executable='stella_ahrs_node',
-                                node_name='stella_ahrs_node',
+                                executable='stella_ahrs_node',
+                                name='stella_ahrs_node',
                                 output='screen',
                                 emulate_tty=True,
-                                node_namespace='/',
+                                namespace='/',
                                 )
-
     return LaunchDescription([
       driver_node,
     ])

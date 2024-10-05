@@ -236,10 +236,10 @@ namespace ntrex
 
     if (res)
     {
-      this->declare_parameter("linear_acceleration_stddev");
-      this->declare_parameter("angular_velocity_stddev");
-      this->declare_parameter("magnetic_field_stddev");
-      this->declare_parameter("orientation_stddev");
+      this->declare_parameter("linear_acceleration_stddev", 0.02);
+      this->declare_parameter("angular_velocity_stddev", 0.01);
+      this->declare_parameter("magnetic_field_stddev", 0.00000327486);
+      this->declare_parameter("orientation_stddev", 0.00125);
 
       this->get_parameter("linear_acceleration_stddev", linear_acceleration_stddev_);
       this->get_parameter("angular_velocity_stddev", angular_velocity_stddev_);
@@ -264,6 +264,7 @@ namespace ntrex
     {
       RCLCPP_INFO(this->get_logger(), "MW-AHRS ROS Init Fail");
     }
+    frame_id_ = "imu";
   }
 
   MwAhrsRosDriver::~MwAhrsRosDriver()
