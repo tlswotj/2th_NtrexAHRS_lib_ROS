@@ -13,24 +13,31 @@ raspberry pi, Jetson Nano, desktop 에서 호환이 가능한 리눅스 라이�
 - 라이브러리 변경 및 함수 추가 됨
 - 세 개의 AHRS 다른 모델 사용 할 수 있도록 만들었음
 
+< 수정사항 - 2024. 11. 1 >
+- 자동으로 플랫폼 cpu를 감지하여 해당 바이너리 파일을 사용하도록 변경 및 폴더 통합
+
 1. 테스트 환경
-  lib_aarch64 : JetSon Xavier
+  lib_aarch64 : JetSon Xavier, Jetson Orin NX
   lib_amd64   : MSI NoteBook
   lib_armv7l  : Raspberry Pi
 
-2. 사용방법
 
-1) 본인이 사용하는 AHRS 데이터 테이블 만들기 (해당 경로에 X1 기준으로 만들었음)
+3. 사용방법
+
+1) 본인이 사용하는 AHRS 데이터 테이블 만들기 (기본은 X1 기준입니다.)
 
 ros2_example/stella_ahrs/include/mw/mw_ahrsX1_def.hpp
 
-2) 이번에 변경된 함수
+2) src 폴더 내부에 listener.cpp 에다가 알맞은 ahrs usb 포트를 기입해 주세요 (기본은 /dev/ttyIMU)
 
+
+
+- 이번에 변경된 함수
 ros2_example/stella_ahrs/include/mw/mw_serial.hpp
 
-3) 개선된 ROS 코드 
-
+- 개선된 ROS 코드 
 ros2_example/stella_ahrs/mw/mw_ahrs.cpp
+
 
 #include "mw_ahrsX1_def.hpp" //해당 헤더파일 추가
 
