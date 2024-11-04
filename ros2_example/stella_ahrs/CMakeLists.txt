@@ -48,14 +48,14 @@ ament_target_dependencies(stella_ahrs_node
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     set(ARCH "aarch64")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-    set(ARCH "amd64")
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "armv7l")
-    set(ARCH "armv7l")
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 else()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 endif()
 
-target_link_libraries(${PROJECT_NAME}_node ${CMAKE_CURRENT_SOURCE_DIR}/lib/MW_AHRS_${ARCH}.a)
+target_link_libraries(${PROJECT_NAME}_node ${CMAKE_CURRENT_SOURCE_DIR}/lib/MW_AHRS_aarch64.a)
 
 ################################################################################
 # Install
