@@ -229,12 +229,12 @@ namespace ntrex
   MwAhrsRosDriver::MwAhrsRosDriver(char *port, int baud_rate) : Node("MW_AHRS_ROS2")
   {
     bool res = false;
-
-    res = MW_AHRS_Connect(port, baud_rate);
+    bool connected = false;
+    res = connected = MW_AHRS_Connect(port, baud_rate);
 
     if(res) res = MW_AHRS_Setting();
 
-    if (res)
+    if (connected)
     {
       this->declare_parameter("linear_acceleration_stddev", 0.02);
       this->declare_parameter("angular_velocity_stddev", 0.01);
