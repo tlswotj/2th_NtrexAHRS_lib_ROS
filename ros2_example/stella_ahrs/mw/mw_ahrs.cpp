@@ -151,7 +151,7 @@ namespace ntrex
 
   void MwAhrsRosDriver::publish_topic()
   {
-    rclcpp::Rate rate(1000);
+    rclcpp::Rate rate(topic_hz);
 
     while (rclcpp::ok() && AHRS)
     {
@@ -202,8 +202,8 @@ namespace ntrex
     bool res = true;
 
     long product_id = 0, software_ver = 0, hardware_ver = 0, function_ver = 0;
-
-    long sync_port = CI_USB, sync_period = 10, sync_trmode = CI_Binary, sync_data = 15, FlashWrite = 1;
+    
+    long sync_port = CI_USB, sync_period = (long) (1000.0/topic_hz), sync_trmode = CI_Binary, sync_data = 15, FlashWrite = 1;
 
     res &= MW_AHRS_GetValI(product_id,   CI_PRODUCT_ID);
     res &= MW_AHRS_GetValI(software_ver, CI_SW_VERSION);
@@ -236,10 +236,10 @@ namespace ntrex
 
     if (connected)
     {
-      this->declare_parameter("linear_acceleration_stddev", 0.02);
+      this->declare_parameter("linear_acceleration_stddev", 0.01);
       this->declare_parameter("angular_velocity_stddev", 0.01);
-      this->declare_parameter("magnetic_field_stddev", 0.00000327486);
-      this->declare_parameter("orientation_stddev", 0.00125);
+      this->declare_parameter("magnetic_field_stddev", 0.01);
+      this->declare_parameter("orientation_stddev", 0.01);
 
       this->get_parameter("linear_acceleration_stddev", linear_acceleration_stddev_);
       this->get_parameter("angular_velocity_stddev", angular_velocity_stddev_);
