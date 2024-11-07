@@ -228,7 +228,7 @@ namespace ntrex
 
   MwAhrsRosDriver::MwAhrsRosDriver(char *port, int baud_rate, long topic_hz) : Node("MW_AHRS_ROS2")
   {
-    this.topic_hz = topic_hz;
+    this->topic_hz = topic_hz;
     bool res = false;
     bool connected = false;
     res = connected = MW_AHRS_Connect(port, baud_rate);
