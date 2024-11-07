@@ -66,7 +66,7 @@ namespace ntrex
         std::mutex _lockAHRS;
 
     public:
-        MwAhrsRosDriver(char *port, int baud_rate);
+        MwAhrsRosDriver(char *port, int baud_rate, long topic_hz);
         ~MwAhrsRosDriver();
 
         void StartReading();
