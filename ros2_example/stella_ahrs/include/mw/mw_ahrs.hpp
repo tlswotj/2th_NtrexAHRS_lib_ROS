@@ -84,6 +84,7 @@ namespace ntrex
         bool MW_AHRS_Setting ();
 
     private:
+        long topic_hz;
         rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_data_raw_pub_, imu_data_pub_;
         rclcpp::Publisher<sensor_msgs::msg::MagneticField>::SharedPtr imu_mag_pub_;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr imu_yaw_pub_;
