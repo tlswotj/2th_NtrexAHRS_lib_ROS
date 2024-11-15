@@ -77,75 +77,79 @@ namespace ntrex
   }
 
   void MwAhrsRosDriver::MwAhrsRead()
-  {
-    while (AHRS)
-    {
-      unsigned char data[8];
+  { 
+    rclcpp::Rate rate(1000);
+    while (rclcpp::ok() && AHRS)
+    { 
+      for(int i=0; i<8; i++){
+        unsigned char data[8];
 
-      if (MW_AHRS_Read(data))
-      {
-        switch ((int)(unsigned char)data[1])
+        if (MW_AHRS_Read(data))
         {
-        case ACC:
-          acc_value[0] = (int16_t)(((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8)) / 1000.0;
-          acc_value[1] = (int16_t)(((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8)) / 1000.0;
-          acc_value[2] = (int16_t)(((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8)) / 1000.0;
+          switch ((int)(unsigned char)data[1])
+          {
+          case ACC:
+            acc_value[0] = (int16_t)(((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8)) / 1000.0;
+            acc_value[1] = (int16_t)(((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8)) / 1000.0;
+            acc_value[2] = (int16_t)(((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8)) / 1000.0;
 
-          imu_data_raw_msg.linear_acceleration.x = imu_data_msg.linear_acceleration.x =
-              acc_value[0] * convertor_g2a;
-          imu_data_raw_msg.linear_acceleration.y = imu_data_msg.linear_acceleration.y =
-              acc_value[1] * convertor_g2a;
-          imu_data_raw_msg.linear_acceleration.z = imu_data_msg.linear_acceleration.z =
-              acc_value[2] * convertor_g2a;
+            imu_data_raw_msg.linear_acceleration.x = imu_data_msg.linear_acceleration.x =
+                acc_value[0] * convertor_g2a;
+            imu_data_raw_msg.linear_acceleration.y = imu_data_msg.linear_acceleration.y =
+                acc_value[1] * convertor_g2a;
+            imu_data_raw_msg.linear_acceleration.z = imu_data_msg.linear_acceleration.z =
+                acc_value[2] * convertor_g2a;
 
-          break;
+            break;
 
-        case GYO:
-          gyr_value[0] = (int16_t)(((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8)) / 10.0;
-          gyr_value[1] = (int16_t)(((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8)) / 10.0;
-          gyr_value[2] = (int16_t)(((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8)) / 10.0;
+          case GYO:
+            gyr_value[0] = (int16_t)(((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8)) / 10.0;
+            gyr_value[1] = (int16_t)(((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8)) / 10.0;
+            gyr_value[2] = (int16_t)(((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8)) / 10.0;
 
-          imu_data_raw_msg.angular_velocity.x = imu_data_msg.angular_velocity.x =
-              gyr_value[0] * convertor_d2r;
-          imu_data_raw_msg.angular_velocity.y = imu_data_msg.angular_velocity.y =
-              gyr_value[1] * convertor_d2r;
-          imu_data_raw_msg.angular_velocity.z = imu_data_msg.angular_velocity.z =
-              gyr_value[2] * convertor_d2r;
+            imu_data_raw_msg.angular_velocity.x = imu_data_msg.angular_velocity.x =
+                gyr_value[0] * convertor_d2r;
+            imu_data_raw_msg.angular_velocity.y = imu_data_msg.angular_velocity.y =
+                gyr_value[1] * convertor_d2r;
+            imu_data_raw_msg.angular_velocity.z = imu_data_msg.angular_velocity.z =
+                gyr_value[2] * convertor_d2r;
 
-          break;
+            break;
 
-        case DEG:
-          deg_value[0] = (int16_t)(((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8)) / 100.0;
-          deg_value[1] = (int16_t)(((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8)) / 100.0;
-          deg_value[2] = (int16_t)(((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8)) / 100.0;
+          case DEG:
+            deg_value[0] = (int16_t)(((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8)) / 100.0;
+            deg_value[1] = (int16_t)(((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8)) / 100.0;
+            deg_value[2] = (int16_t)(((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8)) / 100.0;
 
-          roll = deg_value[0] * convertor_d2r;
-          pitch = deg_value[1] * convertor_d2r;
-          yaw = deg_value[2] * convertor_d2r;
+            roll = deg_value[0] * convertor_d2r;
+            pitch = deg_value[1] * convertor_d2r;
+            yaw = deg_value[2] * convertor_d2r;
 
-          tf_orientation = Euler2Quaternion(roll, pitch, yaw);
+            tf_orientation = Euler2Quaternion(roll, pitch, yaw);
 
-          imu_yaw_msg.data = deg_value[2];
+            imu_yaw_msg.data = deg_value[2];
 
-          imu_data_msg.orientation.x = tf_orientation.x();
-          imu_data_msg.orientation.y = tf_orientation.y();
-          imu_data_msg.orientation.z = tf_orientation.z();
-          imu_data_msg.orientation.w = tf_orientation.w();
+            imu_data_msg.orientation.x = tf_orientation.x();
+            imu_data_msg.orientation.y = tf_orientation.y();
+            imu_data_msg.orientation.z = tf_orientation.z();
+            imu_data_msg.orientation.w = tf_orientation.w();
 
-          break;
+            break;
 
-        case MAG:
-          mag_value[0] = (int16_t)(((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8)) / 10.0;
-          mag_value[1] = (int16_t)(((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8)) / 10.0;
-          mag_value[2] = (int16_t)(((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8)) / 10.0;
+          case MAG:
+            mag_value[0] = (int16_t)(((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8)) / 10.0;
+            mag_value[1] = (int16_t)(((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8)) / 10.0;
+            mag_value[2] = (int16_t)(((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8)) / 10.0;
 
-          imu_magnetic_msg.magnetic_field.x = mag_value[0] / convertor_ut2t;
-          imu_magnetic_msg.magnetic_field.y = mag_value[1] / convertor_ut2t;
-          imu_magnetic_msg.magnetic_field.z = mag_value[2] / convertor_ut2t;
+            imu_magnetic_msg.magnetic_field.x = mag_value[0] / convertor_ut2t;
+            imu_magnetic_msg.magnetic_field.y = mag_value[1] / convertor_ut2t;
+            imu_magnetic_msg.magnetic_field.z = mag_value[2] / convertor_ut2t;
 
-          break;
+            break;
+          }
         }
-      }
+      } 
+      rate.sleep();
     }
   }
 
