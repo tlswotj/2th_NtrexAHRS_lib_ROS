@@ -37,6 +37,14 @@ namespace ntrex
       publisher_thread_.join();
   }
 
+  void MwAhrsRosDriver::resetHeading(const std_msgs::msg::Bool msg){
+    if(msg.data){
+      long resetHeading = 5;
+      MW_AHRS_SetValI(resetHeading , CI_SYS_COMMAND);
+    }
+    
+  }
+
   void MwAhrsRosDriver::MW_AHRS_Covariance(void)
   {
     imu_data_raw_msg = sensor_msgs::msg::Imu();
@@ -78,9 +86,10 @@ namespace ntrex
 
   void MwAhrsRosDriver::MwAhrsRead()
   { 
-    rclcpp::Rate rate(1000);
+    rclcpp::Rate rate(topic_hz);
     while (rclcpp::ok() && AHRS)
-    { 
+    {
+      rate.sleep();
       for(int i=0; i<8; i++){
         unsigned char data[8];
 
@@ -147,9 +156,8 @@ namespace ntrex
 
             break;
           }
-        }
-      } 
-      rate.sleep();
+        } 
+      }
     }
   }
 
@@ -207,7 +215,7 @@ namespace ntrex
 
     long product_id = 0, software_ver = 0, hardware_ver = 0, function_ver = 0;
     
-    long sync_port = CI_USB, sync_period = (long) (1000.0/topic_hz), sync_trmode = CI_Binary, sync_data = 15, FlashWrite = 1;
+    long sync_port = CI_USB, sync_period = (long) (1000.0/topic_hz), sync_trmode = CI_Binary, sync_data = 15, FlashWrite = 1, resetHeading = 5;
 
     res &= MW_AHRS_GetValI(product_id,   CI_PRODUCT_ID);
     res &= MW_AHRS_GetValI(software_ver, CI_SW_VERSION);
@@ -223,9 +231,10 @@ namespace ntrex
     res &= MW_AHRS_SetValI(sync_period, CI_SYNC_PERIOD);
     res &= MW_AHRS_SetValI(sync_trmode, CI_SYNC_TRMODE);
     res &= MW_AHRS_SetValI(sync_data,   CI_SYNC_DATA);
-    res &= MW_AHRS_SetValI(FlashWrite,  CI_SYS_COMMAND);
+    res &= MW_AHRS_SetValI(resetHeading, CI_SYS_COMMAND);
+    //res &= MW_AHRS_SetValI(FlashWrite,  CI_SYS_COMMAND);
 
-    res &= MW_AHRS_NvicReset ();
+    //res &= MW_AHRS_NvicReset ();
 
     return res;
   }
@@ -261,6 +270,7 @@ namespace ntrex
       imu_data_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu/data", qos);
       imu_mag_pub_ = this->create_publisher<sensor_msgs::msg::MagneticField>("imu/mag", qos);
       imu_yaw_pub_ = this->create_publisher<std_msgs::msg::Float64>("imu/yaw", qos);
+      resetHeader_ = this->create_subscription<std_msgs::msg::Bool>("start_imu", 10 , std::bind(&MwAhrsRosDriver::resetHeading , this, std::placeholders::_1));
 
       StartPubing();
       RCLCPP_INFO(this->get_logger(), "MW-AHRS ROS Init Success");
@@ -270,10 +280,13 @@ namespace ntrex
       RCLCPP_INFO(this->get_logger(), "MW-AHRS ROS Init Fail");
     }
     frame_id_ = "imu";
+    parent_frame_id_ = "base_link";
   }
 
   MwAhrsRosDriver::~MwAhrsRosDriver()
   {
+    long stop_data = 0;
+    MW_AHRS_SetValI(stop_data, CI_SYNC_DATA);
     StopReading();
     StopPubing();
     MW_AHRS_DisConnect();
