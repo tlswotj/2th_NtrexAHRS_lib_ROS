@@ -22,6 +22,7 @@ raspberry pi, Jetson Nano, desktop 에서 호환이 가능한 리눅스 라이�
 - 업데이트 주기를 /src/listener.cpp에서 수정할 수 있도록 되었다.(기본 500hz)<br>
 - 기본 통신 속도를 460800으로 변경
 - /start_imu std_msg::msg::Bool 형식의 ture을 담고있는 토픽을 받으면 각도를 0, 0, 0으로 초기화 한다.
+- 기존 에코모드에 대한 오류 가능성 대비 패치 완료하였다(idea robot 커뮤니티 참고)
 ## <br>
 
 #### 1. 테스트 환경
