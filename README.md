@@ -16,7 +16,14 @@ raspberry pi, Jetson Nano, desktop 에서 호환이 가능한 리눅스 라이�
     
 #### < 수정사항 - 2024. 11. 1 >
 - 자동으로 플랫폼 cpu를 감지하여 해당 바이너리 파일을 사용하도록 변경 및 폴더 통합
+<br><br>
+
+#### < 수정사항 - 2025. 1. 8 >
+- 업데이트 주기를 /src/listener.cpp에서 수정할 수 있도록 되었다.(기본 500hz)<br>
+- 기본 통신 속도를 460800으로 변경
+- /start_imu std_msg::msg::Bool 형식의 ture을 담고있는 토픽을 받으면 각도를 0, 0, 0으로 초기화 한다.
 ## <br>
+
 #### 1. 테스트 환경
 * lib_aarch64 : JetSon Xavier, Jetson Orin NX
 *  lib_amd64   : MSI NoteBook
@@ -28,7 +35,7 @@ raspberry pi, Jetson Nano, desktop 에서 호환이 가능한 리눅스 라이�
 ros2_example/stella_ahrs/include/mw/mw_ahrsX1_def.hpp
 
 2) usb시리얼 포트 잡기
-src 폴더 내부에 listener.cpp 에다가 알맞은 ahrs usb 포트를 기입해 주세요 (기본은 /dev/ttyIMU)
+src 폴더 내부에 listener.cpp 에다가 알맞은 ahrs usb 포트를 기입해 주세요 (기본은 /dev/ttyUSB0, 460800속도)
 <br><br>
 
 #### 3. 수정사항
