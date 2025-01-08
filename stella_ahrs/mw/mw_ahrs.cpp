@@ -39,6 +39,7 @@ namespace ntrex
 
   void MwAhrsRosDriver::resetHeading(const std_msgs::msg::Bool msg){
     if(msg.data){
+      RCLCPP_INFO(this->get_logger(), "init imu data");
       long resetHeading = 5;
       MW_AHRS_SetValI(resetHeading , CI_SYS_COMMAND);
     }
