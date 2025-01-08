@@ -1,6 +1,7 @@
 #include <rclcpp/logging.hpp>
 #include <sensor_msgs/msg/magnetic_field.hpp>
 #include <std_msgs/msg/float64.hpp>
+#include <std_msgs/msg/bool.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <unistd.h>
@@ -13,6 +14,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/time_source.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+
 
 #include "mw_serial.hpp"
 
@@ -66,9 +68,10 @@ namespace ntrex
         std::mutex _lockAHRS;
 
     public:
-        MwAhrsRosDriver(char *port, int baud_rate);
+        MwAhrsRosDriver(char *port, int baud_rate, long topic_hz);
         ~MwAhrsRosDriver();
 
+        void resetHeading(const std_msgs::msg::Bool msg);
         void StartReading();
         void StopReading();
         void StartPubing();
@@ -84,9 +87,11 @@ namespace ntrex
         bool MW_AHRS_Setting ();
 
     private:
+        long topic_hz;
         rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_data_raw_pub_, imu_data_pub_;
         rclcpp::Publisher<sensor_msgs::msg::MagneticField>::SharedPtr imu_mag_pub_;
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr imu_yaw_pub_;
+        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr resetHeader_;
         std::unique_ptr<tf2_ros::TransformBroadcaster> broadcaster_;
     };
 }
