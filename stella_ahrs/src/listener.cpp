@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 
     char *port = "/dev/ttyUSB0";
 
-    rclcpp::spin(std::make_shared<ntrex::MwAhrsRosDriver>(port,460800, 500));
+    rclcpp::spin(std::make_shared<ntrex::MwAhrsRosDriver>(port,460800, 100)); //communication baud, topic hz)
     rclcpp::shutdown();
     return 0;
 }
